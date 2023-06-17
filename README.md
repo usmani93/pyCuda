@@ -1,3 +1,3 @@
 # PyTorch
-Just a fun project to get started with Pytorch on CPU, create custom classifier for image classification.
+Just a fun project to get started with Pytorch on GPU, create custom classifier for image classification.
 Work in progress...

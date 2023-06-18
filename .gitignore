@@ -1,6 +1,5 @@
 
 final
-model*
 runs/*
 __pycache__/load_images.cpython-310.pyc
 custom_model
@@ -17,3 +16,7 @@ data/FashionMNIST/raw/t10k-labels-idx1-ubyte.gz
 data/FashionMNIST/raw/t10k-labels-idx1-ubyte
 data/FashionMNIST/raw/t10k-images-idx3-ubyte.gz
 data/FashionMNIST/raw/t10k-images-idx3-ubyte
+model_1_0
+model_1_1
+model_1_3
+custom

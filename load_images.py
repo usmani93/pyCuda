@@ -4,7 +4,7 @@ import torch as t
 import torchvision as tv
 import matplotlib.pyplot as plt
 
-device = t.device("cuda:0" if t.cuda.is_available() else "cpu")
+device = t.device("cuda" if t.cuda.is_available() else "cpu")
 
 def imshow(sample_element, shape = (64, 64)):
     plt.imshow(sample_element[0].numpy().reshape(shape), cmap='gray')
@@ -17,30 +17,32 @@ transform = tv.transforms.Compose(
 
 train_load_start = time.time()
 dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
-dataloader_training = t.utils.data.DataLoader(dataset_training, shuffle = True)
+dataloader_training = t.utils.data.DataLoader(dataset_training, batch_size=64, shuffle = True)
 train_load_end = time.time()
 print('Training data loaded in: {} seconds'.format(train_load_end - train_load_start))
 
 validation_load_start = time.time()
 dataset_validation = tv.datasets.ImageFolder(root='.\Validation', transform=transform)
-dataloader_validation = t.utils.data.DataLoader(dataset_validation, shuffle = False)
+dataloader_validation = t.utils.data.DataLoader(dataset_validation, batch_size=64, shuffle = False)
 validation_load_end = time.time()
 print('Validation data loaded in: {} seconds'.format(validation_load_end - validation_load_start))
 
 load_model_start = time.time()
-model = m.MPL()
-model.to(device)
+model = m.MPL().to(device)
 load_model_end = time.time()
 print('Loaded model in: {} seconds'.format(load_model_end - load_model_start))
 criterion = t.nn.CrossEntropyLoss()
 optimizer = t.optim.Adam(model.parameters(), lr=0.01)
-num_epochs = 20
+num_epochs = 10
 best_vloss = 1_000_000.
 
 train_loss_history = []
 train_acc_history = []
 val_loss_history = []
 val_acc_history = []
+
+print(f'Using {device}')
+t.cuda.init()
 
 training_started = time.time()
 
@@ -64,7 +66,7 @@ for epoch in range(num_epochs):
         train_acc += (output.argmax(1) == labels).sum().item()
         train_loss += loss.item()
 
-        # calculate the average training loss and accuracy
+    # calculate the average training loss and accuracy
     train_loss /= len(dataloader_training)
     train_loss_history.append(train_loss)
     train_acc /= len(dataloader_training.dataset)
@@ -87,7 +89,7 @@ for epoch in range(num_epochs):
     val_acc /= len(dataloader_validation.dataset)
     val_acc_history.append(val_acc)
  
-    print(f'Epoch {epoch+1}/{num_epochs}, train l                                         oss: {train_loss:.4f}, train acc: {train_acc:.4f}')
+    print(f'Epoch {epoch+1}/{num_epochs}, train loss: {train_loss:.4f}, train acc: {train_acc:.4f}')
     print(f'val loss: {val_loss:.4f}, val acc: {val_acc:.4f}')
 
     # Track best performance, and save the model's state

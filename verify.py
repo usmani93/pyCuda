@@ -21,13 +21,13 @@ transform = tv.transforms.Compose(
 
 #load model for evaluation
 custom_model = m.MPL()
-custom_model.load_state_dict(t.load('.\custom_model'))
+custom_model.load_state_dict(t.load('.\custom'))
 print('Model loaded ')
 custom_model.eval()
 
 #load image(s) for prediction
 single_image = lsi.LoadImages(main_dir='.\Single', transform=transform)
-load_single_image = t.utils.data.DataLoader(single_image, shuffle = True)
+load_single_image = t.utils.data.DataLoader(single_image, shuffle = False)
 # image = next(iter(load_single_image))
 print('Image(s) loaded ')
 
@@ -49,9 +49,13 @@ def predict_single_image():
     print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}' for j in range(1)))
     time_elapsed = time_prediction_end - time_prediction_start
     conf = ' with confidence {0:.2f}'.format(_.item())
-    print(time_elapsed)
-    print(conf)
     imshow(image_one, f'{classes[predicted.item()]}{conf} in {time_elapsed}')
+    img = tv.io.read_image("./Single/79.jpg")
+    transform = tv.transforms.Compose([tv.transforms.Resize(size=(64,64))])
+    pimg = transform(img)
+    ou = custom_model(pimg)
+    plt.imshow(np.squeeze(ou.render()))
+    plt.show
 
 def predict_list_of_images():
     time_prediction_start = time.time()
@@ -62,12 +66,14 @@ def predict_list_of_images():
         outputs = custom_model(image)
         probs = t.nn.functional.softmax(outputs, dim=1)
         _, predicted = t.max(probs, 1)
+        print(predicted)
         #range(1) for two classes
         print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}' for j in range(1)))
         print(f'Confidence: {_.item()}')
+        imshow(image, f'{classes[predicted.item()]} {_.item()}')
     time_prediction_end = time.time()
     total_time = time_prediction_end - time_prediction_start
     print('Number of images: {}, time taken: {}'.format(len(load_single_image), total_time))
 
-predict_list_of_images()
-#predict_single_image()
+#predict_list_of_images()
+predict_single_image()
